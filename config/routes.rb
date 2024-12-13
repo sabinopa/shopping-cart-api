@@ -3,7 +3,7 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   mount Sidekiq::Web => '/sidekiq'
   resources :products
-  resource :cart, only: [:create]
+  resource :cart, only: [:create, :show]
 
   get "up" => "rails/health#show", as: :rails_health_check
 
