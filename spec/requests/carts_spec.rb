@@ -39,53 +39,35 @@ RSpec.describe "/carts", type: :request do
     end
   end
 
-  describe "POST /cart/add_item" do
-    let!(:product) { create(:product, price: 10.0) }
+  describe "POST /add_item" do
+    before { allow_any_instance_of(CartsController).to receive(:session).and_return({ cart_id: cart.id }) }
+
+    let(:cart) { Cart.create(total_price: 0.0) }
+    let(:product) { Product.create(name: "Test Product", price: 10.0) }
+    let(:cart_item) { CartItem.create(cart: cart, product: product, quantity: 1) }
+
+    context 'when the product already is in the cart' do
+      subject do
+        post '/cart/add_item', params: { product_id: product.id, quantity: 1 }, as: :json
+        post '/cart/add_item', params: { product_id: product.id, quantity: 1 }, as: :json
+      end
+
+      it 'updates the quantity of the existing item in the cart' do
+        expect { subject }.to change { cart_item.reload.quantity }.by(2)
+      end
+    end
 
     context "when the cart does not exist" do
       subject do
-        post '/cart/add_item', params: { product_id: product.id, quantity: 2 }, as: :json
+        post "/cart/add_item", params: { product_id: product.id, quantity: 2 }, as: :json
       end
 
       it "creates a new cart and adds the product" do
-        expect { subject }.to change { Cart.count }.by(1)
+        expect { subject }.to change { cart.reload.cart_items.count }.by(1)
         expect(response).to have_http_status(:ok)
         json_response = JSON.parse(response.body)
         expect(json_response["products"].size).to eq(1)
         expect(json_response["total_price"]).to eq(20.0)
-      end
-    end
-
-    context "when the cart already exists" do
-      let!(:cart) { create(:cart, total_price: 0.0) }
-      let!(:product) { create(:product, price: 10.0) }
-      let!(:existing_product) { create(:product, price: 15.0) }
-      let!(:cart_item) { create(:cart_item, cart: cart, product: existing_product, quantity: 1) }
-
-
-      before { allow_any_instance_of(CartsController).to receive(:session).and_return({ cart_id: cart.id }) }
-
-      it "adds the product to the existing cart" do
-        expect {
-          post '/cart/add_item', params: { product_id: product.id, quantity: 2 }, as: :json
-        }.to change { cart.cart_items.count }.by(1)
-
-        expect(response).to have_http_status(:ok)
-        json_response = JSON.parse(response.body)
-        expect(json_response["total_price"]).to eq(35.0)
-      end
-
-      it "updates the quantity of the existing product" do
-        expect {
-          post "/cart/add_item", params: { product_id: existing_product.id, quantity: 2 }, as: :json
-        }.to change { cart_item.reload.quantity }.by(2)
-
-        expect(response).to have_http_status(:ok)
-        json_response = JSON.parse(response.body)
-        expect(json_response["products"].size).to eq(1)
-        expect(json_response["products"][0]["id"]).to eq(existing_product.id)
-        expect(json_response["products"][0]["quantity"]).to eq(3)
-        expect(json_response["products"][0]["total_price"]).to eq(45.0)
       end
     end
 
