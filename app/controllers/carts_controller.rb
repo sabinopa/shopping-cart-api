@@ -2,18 +2,18 @@ class CartsController < ApplicationController
   before_action :set_cart
 
   def show
-    render json: cart_response(@cart), status: :ok
+    render json: @cart.as_json_response, status: :ok
   end
 
   def add_item
-    product = Product.find_by(id: params[:product_id])
-    return render json: { error: "Product not found" }, status: :not_found unless product
+    product = find_product
+    return unless product
 
-    quantity = params[:quantity].to_i
-    return render json: { error: "Quantity must be greater than 0" }, status: :unprocessable_entity if quantity <= 0
+    quantity = validate_quantity
+    return unless quantity
 
-    if @cart.add_product(product.id, quantity)
-      render json: cart_response(@cart), status: :ok
+    if @cart.add_item(product.id, quantity)
+      render json: @cart.as_json_response, status: :ok
     else
       render json: { error: @cart.errors.full_messages.join(", ") }, status: :unprocessable_entity
     end
@@ -25,24 +25,32 @@ class CartsController < ApplicationController
 
     return render json: { error: "Quantity must be greater than 0" }, status: :unprocessable_entity if quantity_to_remove <= 0
 
-    cart_item = @cart.cart_items.find_by(product_id: product_id)
-
-    unless cart_item
-      return render json: { error: "Product not in cart" }, status: :not_found
+    begin
+      @cart.remove_item(product_id, quantity_to_remove)
+      render json: @cart.as_json_response, status: :ok
+    rescue ActiveRecord::RecordNotFound => e
+      render json: { error: e.message }, status: :not_found
+    rescue ActiveRecord::RecordInvalid => e
+      render json: { error: e.message }, status: :unprocessable_entity
     end
-
-    if cart_item.quantity > quantity_to_remove
-      cart_item.update!(quantity: cart_item.quantity - quantity_to_remove)
-    else
-      cart_item.destroy!
-    end
-
-    @cart.update!(total_price: @cart.cart_items.sum { |item| item.quantity * item.product.price })
-
-    render json: cart_response(@cart), status: :ok
   end
 
   private
+
+  def find_product
+    product = Product.find_by(id: params[:product_id])
+    render json: { error: "Product not found" }, status: :not_found unless product
+    product
+  end
+
+  def validate_quantity
+    quantity = params[:quantity].to_i
+    if quantity <= 0
+      render json: { error: "Quantity must be greater than 0" }, status: :unprocessable_entity
+      return nil
+    end
+    quantity
+  end
 
   def set_cart
     @cart = Cart.find_by(id: session[:cart_id])
@@ -50,21 +58,5 @@ class CartsController < ApplicationController
       @cart = Cart.create!(total_price: 0.0)
       session[:cart_id] ||= @cart.id
     end
-  end
-
-  def cart_response(cart)
-    {
-      id: cart.id,
-      products: cart.cart_items.map do |item|
-        {
-          id: item.product.id,
-          name: item.product.name,
-          quantity: item.quantity,
-          unit_price: item.product.price.to_f,
-          total_price: (item.product.price * item.quantity).to_f
-        }
-      end,
-      total_price: cart.total_price.to_f
-    }
   end
 end
