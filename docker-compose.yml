@@ -29,9 +29,6 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/cart_development
       - REDIS_URL=redis://redis:6379/0
-    volumes:
-      - ./log:/rails/log
-      - ./tmp:/rails/tmp
 
   test:
     build: .
@@ -43,8 +40,6 @@ services:
       DATABASE_URL: postgresql://postgres:password@db:5432/cart_test
       REDIS_URL: redis://redis:6379/0
     volumes:
-      - ./log:/rails/log
-      - ./tmp:/rails/tmp
       - .:/rails
 
   worker:
@@ -56,9 +51,6 @@ services:
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/store_development
       - REDIS_URL=redis://redis:6379/0
-    volumes:
-      - ./log:/rails/log
-      - ./tmp:/rails/tmp
 
 volumes:
   postgres13:
