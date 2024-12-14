@@ -29,8 +29,6 @@ Para rodar este projeto, certifique-se de ter instalados:
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [Ruby 3.3.1](https://www.ruby-lang.org/en/)
-- [Rails 7.1.3.2](https://rubyonrails.org/)
 
 ## Configuração do Projeto
 
