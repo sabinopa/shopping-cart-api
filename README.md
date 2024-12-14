@@ -1,14 +1,13 @@
 # 🛒 Desafio Técnico - Backend: API de Carrinho de Compras
 
+Olá equipe RD, queria agradecer a oportunidade de realizar esse challenge e de poder compartilhar um pouco do meu trabalho com vocês. Eu aprendi muito nesse processo, e espero que a solução que desenvolvi esteja alinhada com o que vocês esperavam. Fico à disposição para qualquer dúvida ou sugestão. :)
+
+## Descrição
 ![Static Badge](https://img.shields.io/badge/Ruby_3.3.1-CC342D?style=for-the-badge&logo=ruby&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/Ruby_on_Rails_7.1.3-CC0000?style=for-the-badge&logo=ruby-on-rails&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/Sidekiq-B1003E.svg?style=for-the-badge&logo=Sidekiq&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/Docker-2496ED.svg?style=for-the-badge&logo=Docker&logoColor=white)
 ![Static Badge](https://img.shields.io/badge/PostgreSQL-4169E1.svg?style=for-the-badge&logo=PostgreSQL&logoColor=white)
-
-Olá equipe RD, queria agradecer a oportunidade de realizar esse challenge e de poder compartilhar um pouco do meu trabalho com vocês. Eu aprendi muito nesse processo, e espero que a solução que desenvolvi esteja alinhada com o que vocês esperavam. Fico à disposição para qualquer dúvida ou sugestão. :)
-
-## Descrição
 
 Este projeto é uma solução para o desafio técnico proposto pela RD Station, focado no desenvolvimento de uma API para gerenciamento de carrinhos de compras de e-commerce. A aplicação oferece operações essenciais como adicionar produtos, atualizar quantidades, remover itens e gerenciar carrinhos abandonados por meio de jobs agendados.
 
